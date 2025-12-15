@@ -66,12 +66,12 @@ module control_unit (
         jmp_chk   = 0;
         store_pc  = 0;
         return_flags = 0;
-        store_flags = 0;
+        stall = 0;
 
         reg_write_source = 0;
         if (intr_ack) begin
                 alu_src_a = 2'b00;    // R[ra]
-                alu_src_b = 2'b10;    // PC
+                alu_src_b = 2'b01;    // PC
                 reg_1 = 3;
                 sp_dec = 1;
                 mem_write = 1;
@@ -278,12 +278,14 @@ module control_unit (
                         alu_src_a = 2'b00;    // R[ra]
                         reg_1 = 3;
                         sp_inc = 1;
+                        mem_read = 1;
                     end 
                     2'd3: begin // RTI
                         jmp_chk = 6;
                         alu_src_a = 2'b00;    // R[ra]
                         reg_1 = 3;
                         sp_inc = 1;
+                        mem_read = 1;
                         return_flags = 1;
                     end
                 endcase
@@ -430,6 +432,13 @@ module control_unit (
         endcase
     end
 
+    always @(posedge clk) begin
+        if (reset)
+            i_state <= I_NORMAL;
+        else
+            i_state <= i_next_state;
+    end
+
     always @(*) begin
         intr_ack = 0; // default
         intr_active = 0;
@@ -456,7 +465,7 @@ module control_unit (
     reg [2:0] j_state, j_next_state;
 
 
-    always @(posedge clk or posedge reset) begin
+    always @(posedge clk) begin
         if (reset)
             j_state <= J_NORMAL;
         else

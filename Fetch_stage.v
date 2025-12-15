@@ -2,6 +2,7 @@ module Fetch_stage(
     input clk,
     input reset,
     input f_stall,
+    input intr_ack,
     input intr_active,
     input [7:0] instruction,
     input [7:0] immediate,
@@ -12,12 +13,10 @@ module Fetch_stage(
 );
 
     always @(posedge clk) begin
-        if (reset)
-            pc <= 0;
+        if (reset || intr_ack)
+            pc <= instruction;
         else begin
-            else if (intr_active)
-                pc <= pc;
-            else if (f_stall)
+            if (f_stall)
                 pc <= pc;
             else begin
                 if (branch_taken) begin

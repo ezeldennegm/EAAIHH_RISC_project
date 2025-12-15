@@ -44,7 +44,7 @@ module CPU (
             instr_D        <= 0;
             immediate_D    <= 0;
             immediate_en_D <= 0;
-            pc_D           <= 0;
+            pc_D           <= pc_F;
         end else if (!stall_D) begin
             instr_D        <= instr_F;
             immediate_D    <= immediate_F;
@@ -63,6 +63,15 @@ module CPU (
     wire [3:0] alu_op_D;
     wire [1:0] flag_change_D;
     wire [2:0] jmp_chk_D;
+    // for forwarding
+    wire [7:0] alu_out_E;
+    
+    wire [7:0] wb_data_pre;   // value to write back
+
+    // for write back
+    reg       reg_write_W;
+    reg  [1:0] wb_sel_W;
+    wire [7:0] wb_data;
 
     decode_stage ID (
         .clk(clk),
@@ -73,7 +82,7 @@ module CPU (
         .branch_taken_ex(branch_taken_EX),
         .intr(interrupt),
         .alu_out_ex(alu_out_E),
-        .mem_out_mem(wb_data),
+        .mem_out_mem(wb_data_pre),
         .wb_out(wb_data),
         .input_port(input_port),
         .wb_we(reg_write_W),
@@ -114,7 +123,7 @@ module CPU (
 
     always @(posedge clk) begin
         if (reset || flush_EX) begin
-            A_E <= 0; B_E <= 0; pc_E <= 0;
+            A_E <= 0; B_E <= 0; pc_E <= pc_D;
             reg_write_E <= 0; mem_read_E <= 0; mem_write_E <= 0;
             alu_op_E <= 0; flag_change_E <= 0; wb_sel_E <= 0;
             jmp_chk_E <= 0; store_pc_E <= 0; return_flags_E <= 0;
@@ -137,7 +146,7 @@ module CPU (
     // ===============================
     // EXECUTE STAGE WIRES
     // ===============================
-    wire [7:0] alu_out_E;
+    
     wire       branch_taken_E;
     wire [7:0] branch_target_E;
     wire [3:0] flags_out_E;
@@ -152,7 +161,7 @@ module CPU (
         .jump_type(jmp_chk_E),
         .intr_ack(intr_ack),
         .restore_flags(return_flags_E),
-        .mem_out(wb_data),
+        .mem_out(wb_data_pre),
         .alu_out(alu_out_E),
         .branch_taken(branch_taken_E),
         .branch_target(branch_target_E),
@@ -167,7 +176,7 @@ module CPU (
     // EX/MEM PIPELINE REGISTER
     // ===============================
     reg [7:0] A_M, B_M, alu_out_M;
-    reg       mem_write_M;
+    reg       mem_write_M, reg_write_M;
     reg  [1:0] mem_read_M, wb_sel_M;
 
     always @(posedge clk) begin
@@ -181,6 +190,7 @@ module CPU (
             mem_write_M <= 1'b0;
             mem_read_M  <= 1'b0;
             wb_sel_M    <= 2'b00;
+            reg_write_M <= 1'b0;
 
         end else if (flush_M) begin
             // Bubble injection: kill side effects
@@ -192,6 +202,7 @@ module CPU (
             A_M       <= 8'b0;
             B_M       <= 8'b0;
             alu_out_M <= 8'b0;
+            reg_write_M <= 1'b0;
 
         end else begin
             A_M         <= A_E;
@@ -200,6 +211,7 @@ module CPU (
             mem_write_M <= (store_pc_E) ? 1:  mem_write_E;
             mem_read_M  <= (store_pc_E) ? pc_E:mem_read_E;
             wb_sel_M    <= wb_sel_E;
+            reg_write_M <= reg_write_E;
         end
     end
 
@@ -212,6 +224,7 @@ module CPU (
         .clk(clk),
         .rst(reset),
         .we(mem_write_M),
+        .intr_ack(intr_ack),
         .data_in(B_M),
         .addr_in(A_M),
         .addr_instr(pc_F),
@@ -228,13 +241,10 @@ module CPU (
     // ===============================
     // WB DATA
     // ===============================
-    wire [7:0] wb_data_pre;   // value to write back
     assign wb_data_pre = (mem_read_M) ? mem_data_out : alu_out_M;
 
     // MEM/WB pipeline register
     reg [7:0] wb_data_reg;
-    reg       reg_write_W;
-    reg  [1:0] wb_sel_W;
 
     always @(posedge clk) begin
         if (reset) begin
@@ -249,7 +259,7 @@ module CPU (
     end
 
 
-    wire [7:0] wb_data = wb_data_reg;
+    assign wb_data = wb_data_reg;
 
 
 endmodule
