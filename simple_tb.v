@@ -42,7 +42,7 @@ module cpu_reset_tb;
         // Load memory and register file
         // -------------------------------
         $readmemh("mem.dat", DUT.MEM_UNIT.mem);
-        $readmemh("reg.dat", DUT.ID.RF.R);
+        
 
         repeat (3) @(negedge clk);
         reset = 1;
@@ -53,9 +53,9 @@ module cpu_reset_tb;
 
         // Deassert reset
         reset = 0;
-        intr = 1;
+
+        $readmemh("reg.dat", DUT.ID.RF.R);
         repeat (3) @(negedge clk);
-        intr = 0;
         // Run for a few cycles
         repeat (30) @(negedge clk);
 
