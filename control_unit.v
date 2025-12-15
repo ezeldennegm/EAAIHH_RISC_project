@@ -59,6 +59,8 @@ module control_unit (
         reg_2     = 2'b00;
         alu_src_a = 2'b01;    // Immediate
         alu_src_b = 2'b01;    // Immediate
+        forward_src_a = 2'b00;
+        forward_src_b = 2'b00;
         wb_sel    = 2'b00;    // ALU
         sp_inc    = 0;
         sp_dec    = 0;
@@ -336,13 +338,16 @@ module control_unit (
                             stall = 1;
                         end else begin
                             forward_src_a = 2'b00; // Source is ALU OUT
+                            alu_src_a = 2'b10;
                         end
                     end
                     rt_mem: begin
                         forward_src_a = 2'b01; // Source is mem OUT
+                        alu_src_a = 2'b10;
                     end
                     rt_wb: begin
                         forward_src_a = 2'b10; // Source is wb OUT
+                        alu_src_a = 2'b10;
                     end
                 endcase
             end
@@ -354,14 +359,17 @@ module control_unit (
                         if (rt_ex[3] == 1) begin // Source is memory
                             stall = 1;
                         end else begin
-                            forward_src_a = 2'b00; // Source is ALU OUT
+                            forward_src_b = 2'b00; // Source is ALU OUT
+                            alu_src_b = 2'b10;
                         end
                     end
                     rt_mem: begin
-                        forward_src_a = 2'b01; // Source is mem OUT
+                        forward_src_b = 2'b01; // Source is mem OUT
+                        alu_src_b = 2'b10;
                     end
                     rt_wb: begin
-                        forward_src_a = 2'b10; // Source is wb OUT
+                        forward_src_b = 2'b10; // Source is wb OUT
+                        alu_src_b = 2'b10;
                     end
                 endcase
             end
