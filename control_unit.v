@@ -272,7 +272,6 @@ module control_unit (
                         reg_1 = 3;
                         reg_2 = rb;
                         sp_dec = 1;
-                        mem_write = 1;
                         store_pc = 1; // needs modification
                     end
                     2'd2: begin // RET
@@ -295,12 +294,12 @@ module control_unit (
             // L - Format
             4'd12: begin // 2 byte INSTRUCTIONS
                 case (ra)
-                    2'd0: begin
-                        alu_src_a = 1;
+                    2'd0: begin // LDM
+                        alu_src_a = 2'b01; // immediate
                         wb_sel = rb;
                         reg_write = 1;
                     end
-                    2'd1: begin
+                    2'd1: begin // LDD
                         mem_read = 1;
                         alu_src_a = 1;
                         wb_sel = rb;
@@ -308,23 +307,27 @@ module control_unit (
 
                         reg_write_source = 1;
                     end
-                    2'd2: begin
+                    2'd2: begin // STD
                         mem_write = 1;
-                        alu_src_a = 1;
+                        alu_src_a = 2'b01; // immediate
+                        alu_src_b = 2'b00; // R[rb]
                         reg_2 = rb;
                     end
                 endcase
             end
-            4'd13: begin
+            4'd13: begin // LDI
                 mem_read = 1;
                 reg_write = 1;
+                alu_src_a = 2'b00;    // R[ra]
                 wb_sel = rb;
                 reg_1 = ra;
 
                 reg_write_source = 1;
             end
-            4'd14: begin
+            4'd14: begin // STI
                 mem_write = 1;
+                alu_src_a = 2'b00;    // R[ra]
+                alu_src_b = 2'b00;    // R[rb]
                 reg_1 = ra;
                 reg_2 = rb;
             end

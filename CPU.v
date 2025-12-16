@@ -206,10 +206,10 @@ module CPU (
 
         end else begin
             A_M         <= A_E;
-            B_M         <= B_E;
+            B_M         <= (store_pc_E) ? pc_E:B_E;
             alu_out_M   <= alu_out_E;
             mem_write_M <= (store_pc_E) ? 1:  mem_write_E;
-            mem_read_M  <= (store_pc_E) ? pc_E:mem_read_E;
+            mem_read_M  <= mem_read_E;
             wb_sel_M    <= wb_sel_E;
             reg_write_M <= reg_write_E;
         end
