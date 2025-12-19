@@ -47,7 +47,8 @@ module control_unit (
 
     // for hazard checking
     reg [3:0]   rt_ex, rt_mem, rt_wb; // Destination and whether it will write and source
-    wire [3:0] rt_dc =  {reg_write_source, reg_write, wb_sel};
+    wire [3:0] rt_dc =  {mem_read, reg_write, wb_sel};
+    reg prev_mem_read;
     always @(*) begin
         // defaults
         reg_write = 0;
@@ -336,19 +337,20 @@ module control_unit (
         begin
             if (alu_src_a == 0 /* Source is chosen reg from register file*/) begin
                 case ({1'b1,reg_1})
-                    rt_ex: begin
-                        if (rt_ex[3] == 1) begin // Source is memory
+                    rt_ex[2:0]: begin
+                        if (prev_mem_read == 1'b1) begin // Source is memory
                             stall = 1;
                         end else begin
                             forward_src_a = 2'b00; // Source is ALU OUT
                             alu_src_a = 2'b10;
                         end
+                        $display("ahlan");
                     end
-                    rt_mem: begin
+                    rt_mem[2:0]: begin
                         forward_src_a = 2'b01; // Source is mem OUT
                         alu_src_a = 2'b10;
                     end
-                    rt_wb: begin
+                    rt_wb[2:0]: begin
                         forward_src_a = 2'b10; // Source is wb OUT
                         alu_src_a = 2'b10;
                     end
@@ -358,19 +360,19 @@ module control_unit (
         begin
             if (alu_src_b == 0 /* Source is chosen reg from register file*/) begin
                 case ({1'b1,reg_2})
-                    rt_ex: begin
-                        if (rt_ex[3] == 1) begin // Source is memory
+                    rt_ex[2:0]: begin
+                        if (rt_ex[3] == 1'b1) begin // Source is memory
                             stall = 1;
                         end else begin
                             forward_src_b = 2'b00; // Source is ALU OUT
                             alu_src_b = 2'b10;
                         end
                     end
-                    rt_mem: begin
+                    rt_mem[2:0]: begin
                         forward_src_b = 2'b01; // Source is mem OUT
                         alu_src_b = 2'b10;
                     end
-                    rt_wb: begin
+                    rt_wb[2:0]: begin
                         forward_src_b = 2'b10; // Source is wb OUT
                         alu_src_b = 2'b10;
                     end
@@ -389,10 +391,12 @@ module control_unit (
             rt_ex   <=0;
             rt_mem  <=0;
             rt_wb   <=0;
+            prev_mem_read <= 0;
         end else begin
-            rt_ex   <= (stall_D) ? 0:rt_dc;
+            rt_ex   <= (stall) ? 0:rt_dc;
             rt_mem  <= rt_ex;
             rt_wb   <= rt_mem;
+            prev_mem_read <= mem_read;
         end
     end
     // ============================================================
