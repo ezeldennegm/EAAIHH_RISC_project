@@ -120,6 +120,7 @@ module CPU (
     reg  [3:0] alu_op_E;
     reg  [1:0] flag_change_E;
     reg  [2:0] jmp_chk_E;
+    reg        read_out_E;
 
     always @(posedge clk) begin
         if (reset || flush_EX) begin
@@ -128,6 +129,7 @@ module CPU (
             reg_write_E <= 0; mem_read_E <= 0; mem_write_E <= 0;
             alu_op_E <= 0; flag_change_E <= 0; wb_sel_E <= 0;
             jmp_chk_E <= 0; store_pc_E <= 0; return_flags_E <= 0;
+            read_out_E <= 0;
         end else begin
             A_E <= A_D;
             B_E <= B_D;
@@ -141,6 +143,7 @@ module CPU (
             jmp_chk_E <= jmp_chk_D;
             store_pc_E <= store_pc_D;
             return_flags_E <= return_flags_D;
+            read_out_E <= read_out_D;
         end
     end
 
@@ -172,6 +175,8 @@ module CPU (
 
     assign branch_taken_EX = branch_taken_E;
     assign branch_target_EX = branch_target_E;
+
+    assign OUT = (read_out_E) ? B_E : 0;
 
     // ===============================
     // EX/MEM PIPELINE REGISTER

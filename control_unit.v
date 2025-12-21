@@ -344,7 +344,6 @@ module control_unit (
                             forward_src_a = 2'b00; // Source is ALU OUT
                             alu_src_a = 2'b10;
                         end
-                        $display("ahlan");
                     end
                     rt_mem[2:0]: begin
                         forward_src_a = 2'b01; // Source is mem OUT
@@ -555,6 +554,7 @@ module control_unit (
         flush_F = 0;
         flush_D = 0;
         flush_EX = 0;
+        flush_M = 0;
 
         case (j_state)
 
@@ -562,6 +562,7 @@ module control_unit (
             J_UNCOND: begin
                 flush_F = 1;
                 flush_D = 1;
+                flush_EX = 1;
             end
 
             // Delayed jump executes HERE (second delayed state)
@@ -569,6 +570,7 @@ module control_unit (
                 flush_F = 1;
                 flush_D = 1;
                 flush_EX = 1;
+                flush_M = 1;
             end
 
             // Conditional jump (only if condition true)
@@ -576,6 +578,7 @@ module control_unit (
                 if (branch_taken) begin
                     flush_F = 1;
                     flush_D = 1;
+                    flush_EX = 1;
                 end
             end
 
