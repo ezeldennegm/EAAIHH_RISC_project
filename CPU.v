@@ -123,14 +123,15 @@ module CPU (
 
     always @(posedge clk) begin
         if (reset || flush_EX) begin
-            A_E <= 0; B_E <= 0; pc_E <= pc_D;
+            A_E <= 0; B_E <= 0; 
+            pc_E <= pc_D + 1;// For Call
             reg_write_E <= 0; mem_read_E <= 0; mem_write_E <= 0;
             alu_op_E <= 0; flag_change_E <= 0; wb_sel_E <= 0;
             jmp_chk_E <= 0; store_pc_E <= 0; return_flags_E <= 0;
         end else begin
             A_E <= A_D;
             B_E <= B_D;
-            pc_E <= pc_D;
+            pc_E <= pc_D + 1;// For Call
             reg_write_E <= reg_write_D;
             mem_read_E <= mem_read_D;
             mem_write_E <= mem_write_D;
