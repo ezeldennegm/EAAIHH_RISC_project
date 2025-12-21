@@ -37,9 +37,9 @@ module reg_file(
             R[wr_addr] <= wr_data;
         end
         if (sp_inc) begin
-            R[3] = R[3] + 1;
+            R[3] <= R[3] + 1;
         end else if (sp_dec) begin
-            R[3] = R[3] - 1;
+            R[3] <= R[3] - 1;
         end
     end
 endmodule

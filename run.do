@@ -79,12 +79,15 @@ add wave \
 add wave -divider "EXECUTE (E)"
 add wave \
     sim:/cpu_reset_tb/DUT.alu_op_E \
-    sim:/cpu_reset_tb/DUT.flags_out_E\
     sim:/cpu_reset_tb/DUT.A_E \
     sim:/cpu_reset_tb/DUT.B_E \
     sim:/cpu_reset_tb/DUT.mem_write_E \
     sim:/cpu_reset_tb/DUT.mem_read_E \
-    sim:/cpu_reset_tb/DUT.alu_out_E
+    sim:/cpu_reset_tb/DUT.alu_out_E \
+    sim:/cpu_reset_tb/DUT.EX.C\
+    sim:/cpu_reset_tb/DUT.EX.V\
+    sim:/cpu_reset_tb/DUT.EX.Z\
+    sim:/cpu_reset_tb/DUT.EX.N
 
 # -------- Memory Stage --------
 add wave -divider "MEMORY (M)"
