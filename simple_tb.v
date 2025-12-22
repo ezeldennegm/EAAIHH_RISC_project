@@ -11,7 +11,7 @@ module cpu_reset_tb;
     // ===============================
     reg  intr;
     wire [7:0] OUT;
-    wire [7:0] input_port;
+    reg [7:0] input_port;
 
     // ===============================
     // Instantiate CPU
@@ -47,14 +47,15 @@ module cpu_reset_tb;
         repeat (3) @(negedge clk);
         reset = 1;
         intr = 0;
+        input_port = 8'hfd;
 
         // Hold reset for a few cycles
         repeat (3) @(negedge clk);
 
         // Deassert reset
         reset = 0;
-
         $readmemh("reg.dat", DUT.ID.RF.R);
+        
         repeat (3) @(negedge clk);
         // Run for a few cycles
         repeat (30) @(negedge clk);

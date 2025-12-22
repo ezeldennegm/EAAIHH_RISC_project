@@ -40,7 +40,7 @@ module CPU (
     reg       immediate_en_D;
 
     always @(posedge clk) begin
-        if (reset || flush_D) begin
+        if ((reset || flush_D) || intr_ack) begin
             instr_D        <= 0;
             immediate_D    <= 0;
             immediate_en_D <= 0;

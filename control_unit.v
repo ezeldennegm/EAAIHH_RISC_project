@@ -59,7 +59,7 @@ module control_unit (
         reg_1     = 2'b00;
         reg_2     = 2'b00;
         alu_src_a = 2'b01;    // Immediate
-        alu_src_b = 2'b01;    // Immediate
+        alu_src_b = 2'b11;    // input_port
         forward_src_a = 2'b00;
         forward_src_b = 2'b00;
         wb_sel    = 2'b00;    // ALU
