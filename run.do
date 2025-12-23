@@ -37,7 +37,8 @@ add wave -divider "GLOBAL"
 add wave \
     sim:/cpu_reset_tb/clk \
     sim:/cpu_reset_tb/reset \
-    sim:/cpu_reset_tb/OUT
+    sim:/cpu_reset_tb/OUT\
+    sim:/cpu_reset_tb/intr
 
 # -------- Fetch Stage --------
 add wave -divider "FETCH (F)"
@@ -84,6 +85,10 @@ add wave \
     sim:/cpu_reset_tb/DUT.mem_write_E \
     sim:/cpu_reset_tb/DUT.mem_read_E \
     sim:/cpu_reset_tb/DUT.alu_out_E \
+    sim:/cpu_reset_tb/DUT.jmp_chk_E\
+    sim:/cpu_reset_tb/DUT.branch_taken_EX\
+    sim:/cpu_reset_tb/DUT.branch_target_EX\
+    sim:/cpu_reset_tb/DUT.pc_F\
     sim:/cpu_reset_tb/DUT.EX.C\
     sim:/cpu_reset_tb/DUT.EX.V\
     sim:/cpu_reset_tb/DUT.EX.Z\

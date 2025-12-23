@@ -45,7 +45,7 @@ module CPU (
             immediate_D    <= 0;
             immediate_en_D <= 0;
             pc_D           <= pc_F;
-        end else if (!stall_D) begin
+        end else if (!stall_F) begin
             instr_D        <= instr_F;
             immediate_D    <= immediate_F;
             immediate_en_D <= immediate_en_F;
@@ -130,7 +130,7 @@ module CPU (
             alu_op_E <= 0; flag_change_E <= 0; wb_sel_E <= 0;
             jmp_chk_E <= 0; store_pc_E <= 0; return_flags_E <= 0;
             read_out_E <= 0;
-        end else begin
+        end else if (!stall_D) begin
             A_E <= A_D;
             B_E <= B_D;
             pc_E <= pc_D + 1;// For Call
